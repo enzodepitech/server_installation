@@ -1,0 +1,200 @@
+* Introduction
+
+Doc sur le serveur.
+
+* Installation
+** Proxmox
+
+Installation de Proxmox VE: https://blog.stephane-robert.info/docs/virtualiser/type1/proxmox/fondamentaux/installation/
+
+** Serveur Web du HUB
+
+Dossier HUB du serveur
+Dockerfile disponible
+Docker compose disponible
+
+* Wifi
+** Information
+
+|---------+-------------------|
+| Name    | REDACTED   |
+| REDACTED    | REDACTED |
+|---------+-------------------|
+
+** Pre-requisites
+*** Detect USB dongle
+
+To verify if the dongle is recognized by the server.
+
+#+begin_src bash
+lsusb
+#+end_src
+
+Search for device with wifi driver name (eg. 88xbu)
+
+*** Install WiFi tools
+
+#+begin_src bash
+sudo apt install -y wpa_supplicant wireless-tools
+#+end_src
+
+** WiFi Interface
+
+In =/etc/network/interfaces=, copy & paste this text. The wpa_supplicant.conf file describes the interface connection. You can crypt your password (in next modules).
+
+#+begin_src 
+allow-hotplug REDACTED
+iface REDACTED inet dhcp
+        dns-nameservers 1.1.1.1 8.8.8.8
+        wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+#+end_src
+
+** Setup wpa conf
+
+You can add a network in =/etc/wpa_supplicant/wpa_supplicant.conf= file.
+
+*** IONIS configuration
+
+#+begin_src
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+  ssid="IONIS"
+  scan_ssid=1
+  eap=PEAP
+  key_mgmt=WPA-EAP
+
+  phase2="auth=MSCHAPV2"
+
+  identity="<mail>@epitech.eu"
+  password=hash:<your_hashed_password>
+
+  phase1="peapver=0"
+}
+#+end_src
+
+** Crypt password
+
+This command will crypt your password to enhance security.
+
+#+begin_src sh
+  echo -n "<your_password>" | iconv -t utf16le | openssl dgst -provider legacy -provider default -md4
+#+end_src
+
+** Setup VM bridge
+
+With WiFi, simple bridge doesn't work (device block multiple mac adresses resolution). You will need to use NAT/Masquering method.
+
+*** Virtual Bridge
+
+Example: <vm_gateway_address> = 192.168.10.1; <vm_network> = 192.168.10.0; <vm_network_mask> = 24
+
+#+begin_src 
+auto vmbr0
+iface vmbr0 inet static
+        address <vm_gateway_address>/<vm_network_mask>
+        bridge-ports none
+        bridge-stp off
+        bridge-fd 0
+
+        post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+        post-up iptables -t nat -A POSTROUTING -s '<vm_network>/24' -o REDACTED -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s '<vm_network>/24' -o REDACTED -j MASQUERADE
+#+end_src
+
+*** Dnsmasq
+**** Installation
+
+#+begin_src bash
+sudo apt install dnsmasq
+#+end_src
+
+**** Configuration
+
+Ensure these lines are active:
+
+#+begin_src 
+# Listen on the vmbr0 bridge
+interface=vmbr0
+# Disable default DHCP on other interfaces
+except-interface=lo
+except-interface=[wifi_interface]
+# Do this for every unused interface
+except-interface=[other_unused_interface]
+
+# DHCP Range for VMs
+dhcp-range=[first_ip_of_VM_in_vm_network],[last_ip_of_VM_in_vm_network],[netmask_in_dot_format_for_VM_network],[lease_time]
+# Example:
+# dhcp-range=10.10.1.194,10.10.1.222,255.255.255.224,24h
+
+# Gateway and DNS for VMs (points to the Proxmox host)
+dhcp-option=3,[Proxmox_host_IP]
+dhcp-option=6,[Proxmox_host_IP]
+
+conf-dir=/etc/dnsmasq.d,*.conf
+#+end_src
+
+***** Static IP
+
+Static IPs for VMs are setted with Terraform, not in the dnsmasq configuration file.
+
+**** Restart
+
+#+begin_src bash
+  sudo systemctl restart dsnmasq
+#+end_src
+
+* IaC
+** Terraform
+
+Terraform will be used to define and maintain VMs and LXC Containers.
+
+** Ansible
+
+Ansible will be used to setup vms.
+
+* Guacamole (SSH Access)
+** Proxmox Community Script
+
+It will create a LXC Container running a guacamole apache server.
+
+#+begin_src bash
+bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/apache-guacamole.sh)
+#+end_src
+
+** Terraform configuration
+
+** Ansible configuration
+
+* Nginx Proxy Manager
+
+We use a local Nginx Proxy Manager to map urls to ip:port. Example: a student taps "my_server.domainepitech" in his browser and it redirects to "192.168.1.1:4000" internally without showing him.
+
+* Intranet
+** Wiki
+* GiTea 
+* Hébergement
+** Solution 1
+
+VPS (install WireGuard server (reverse tunneling) & Nginx (reverse proxy))
+Proxmox (install WireGuard client)
+
+Problème: Impossible d'avoir une IP publique accessible partout avec IONIS sans demander autorisation à Epitech avec potentiellement un refus.
+Principe: Etudiant utilise l'adresse publique du vps qui redirige (via un VPN (tunnel entre vps et promox) + Nginx (traduit ip publique vers ip de l'interface proxmox)) vers proxmox.
+
+Problèmes: VPS de Google donc les données transitent par eux.
+VPS coûte de l'argent (le mien est gratuit pendant quelques mois).
+
+Ajout nom de domaine gratuit (duckdns)
+On pourrait ajouter un nom de domaine pour avoir plusieurs redirection sans ouvrir de port (config via Nginx).
+
+** Solution 2
+
+On demande à Epitech d'avoir des sous-domaines de epitech.eu (sous-domaine wildcard) pour permettre la redirection des liens mais configuration de leur part de leur reverse proxy (plus ou moins complexe d'ajouter un site).
+
+** Solution 3 (local)
+
+Disponible que sur IONIS, les étudiants doivent être sur le réseau de l'école pour avoir accès.
+Nom de domaine (soit epitech officiel soit autre temporairement)+ Ajouter Nginx en local sur le serveur pour les redirections.
+
