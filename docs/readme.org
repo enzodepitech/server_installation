@@ -161,6 +161,15 @@ Services configuration files:
   - guacamole.tf
   - student-vms.tf
 
+Create a terraform user (eg. terraform-user)
+Granted Administrator Permissions
+Create an API Token
+Create a ssh key
+
+#+begin_src bash
+  ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
+#+end_src
+  
 ** Ansible
 
 Ansible will be used to setup vms.
