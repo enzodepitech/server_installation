@@ -21,6 +21,8 @@ Docker compose disponible
 | REDACTED    | REDACTED |
 |---------+-------------------|
 
+Ressource: https://github.com/ThomasRives/Proxmox-over-wifi/blob/main/README.md
+
 ** Pre-requisites
 *** Detect USB dongle
 
@@ -148,7 +150,16 @@ Static IPs for VMs are setted with Terraform, not in the dnsmasq configuration f
 * IaC
 ** Terraform
 
-Terraform will be used to define and maintain VMs and LXC Containers.
+Terraform will be used to define and maintain VMs and LXC Containers. We use one terraform file per service.
+
+Global configuration files:
+  - provider.tf (proxmox)
+  - variables.tf
+  - terraform.tfvars (secrets)
+
+Services configuration files:
+  - guacamole.tf
+  - student-vms.tf
 
 ** Ansible
 
@@ -164,6 +175,8 @@ bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/c
 #+end_src
 
 ** Terraform configuration
+
+
 
 ** Ansible configuration
 

@@ -1,0 +1,54 @@
+# Ignore all
+/*
+
+# Don't ignore gitignore
+!/.gitignore
+
+# Don't ignore readme
+!/README.md
+
+# ---------------------
+#      Docs
+# ---------------------
+
+# Don't ingore docs
+!/docs
+
+# ---------------------
+#      Terraform
+# ---------------------
+
+# Don't ignore docs
+!/terraform
+
+# Ignore init files
+/terraform/.terraform/
+/terraform/.terraform.lock.hcl
+
+# Ignore state files
+/terraform/*.tfstate
+/terraform/*.tfstate.*
+/terraform/*.tfstate.backup
+
+# Ignore secrets files
+/terraform/*.tfvars
+/terraform/*.tfvars.json
+/terraform/override.tf
+/terraform/override.tf.json
+/terraform/*_override.tf
+/terraform/*_override.tf.json
+
+# Ignore log files
+/terraform/*.log
+
+# ---------------------
+#      Ansible
+# ---------------------
+
+!/ansible
+
+# ---------------------
+#      Network
+# ---------------------
+
+!/network
