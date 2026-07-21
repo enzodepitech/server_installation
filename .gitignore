@@ -46,9 +46,21 @@
 # ---------------------
 
 !/ansible
+/ansible/.ansible
+/ansible/*.retry
 
 # ---------------------
 #      Network
 # ---------------------
 
 !/network
+
+# ---------------------
+#      Security 
+# ---------------------
+
+*.key
+*.pem
+.vault_password
+.env
+*.log
