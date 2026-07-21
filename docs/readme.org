@@ -161,13 +161,31 @@ Services configuration files:
   - guacamole.tf
   - student-vms.tf
 
-Create a terraform user (eg. terraform-user)
-Granted Administrator Permissions
-Create an API Token
-Create a ssh key
+*** Create proxmox terraform role
 
 #+begin_src bash
-  ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
+pveum role add TerraformProvider -privs "VM.Allocate VM.Audit VM.Clone VM.Config.Disk VM.Config.CPU VM.Config.Memory VM.Config.Network VM.Config.Options VM.Config.Cloudinit VM.Config.CDROM VM.Config.HWType VM.PowerMgmt VM.Console VM.Migrate VM.GuestAgent.Audit Datastore.Allocate Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Modify SDN.Use"
+#+end_src
+
+*** Create User
+
+#+begin_src bash
+  pveum user add terraform-prov@pve
+  pveum aclmod / -user terraform-prov@pve -role TerraformProvider
+#+end_src
+
+*** Create an API Token
+
+#+begin_src bash
+pveum user token add terraform-prov@pve terraform -expire 0 -privsep 0 -comment "Terraform token"
+#+end_src
+
+Write the secret, it will never be displayed again!
+
+*** Create a Ssh key
+
+#+begin_src bash
+ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
 #+end_src
   
 ** Ansible
