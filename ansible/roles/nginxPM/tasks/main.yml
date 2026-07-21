@@ -1,0 +1,25 @@
+---
+- name: Check Docker installation
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: "{{ npm_app_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy docker compose file
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: "{{ npm_app_dir }}/docker-compose.yml"
+    mode: '0644'
+
+- name: Start Nginx Proxy Manager Container
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ npm_app_dir }}"

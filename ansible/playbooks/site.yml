@@ -1,0 +1,6 @@
+---
+- name: Deploy Nginx Proxy Manager
+  hosts: proxy
+  become: true
+  roles:
+    - nginxPM
