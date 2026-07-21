@@ -41,7 +41,7 @@ resource "proxmox_virtual_environment_container" "guacamole" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.debian_13_template.id
+    template_file_id = proxmox_download_file.debian_13_template.id
     type             = "debian"
   }
 

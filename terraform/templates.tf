@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_download_file" "debian_13_template" {
+resource "proxmox_download_file" "debian_13_template" {
   content_type = "vztmpl"
   datastore_id = "local"
   node_name    = "pve"
