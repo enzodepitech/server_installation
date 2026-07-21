@@ -29,7 +29,6 @@
     architectures:
       - amd64
     signed_by: /etc/apt/keyrings/docker.asc
-    enabled: yes
 
 - name: Install Docker Engine
   ansible.builtin.apt:
