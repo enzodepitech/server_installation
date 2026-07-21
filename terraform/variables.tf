@@ -10,3 +10,9 @@ variable "ssh_public_key" {
   description = "Public SSH key to inject into created LXC containers"
   default = "~/.ssh/id_rsa.pub"
 }
+
+variable "proxmox_api_token" {
+  type        = string
+  description = "API Token for Proxmox in the format: USER@REALM!TOKENID=SECRET"
+  sensitive   = true
+}
