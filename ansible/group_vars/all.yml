@@ -1,3 +1,4 @@
 ---
 # Base Domain
 domain_base: "lilepiserv.duckdns.org"
+npm_app_dir: "/opt/nginxPM/"
