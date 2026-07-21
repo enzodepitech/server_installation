@@ -19,7 +19,7 @@
     dest: "{{ npm_app_dir }}/docker-compose.yml"
     mode: '0644'
 
-- name: Start Nginx Proxy Manager Container
-  community.docker.docker_compose_v2
+- name: Deploy Nginx Proxy Manager Container
+  community.docker.docker_compose_v2:
     project_src: "{{ npm_app_dir }}"
     state: present
