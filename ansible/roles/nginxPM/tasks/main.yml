@@ -20,6 +20,6 @@
     mode: '0644'
 
 - name: Start Nginx Proxy Manager Container
-  ansible.builtin.command: docker compose up -d
-  args:
-    chdir: "{{ npm_app_dir }}"
+  community.docker.docker_compose_v2
+    project_src: "{{ npm_app_dir }}"
+    state: present

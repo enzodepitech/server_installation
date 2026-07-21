@@ -192,6 +192,34 @@ ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
 
 Ansible will be used to setup VMs and LXC Containers.
 
+*** Installation
+
+**** Install pipx
+
+#+begin_src bash
+apt update && apt install -y pipx
+#+end_src
+
+**** Configure PATH
+
+#+begin_src bash
+pipx ensurepath
+#+end_src
+
+**** Reload bashrc
+
+#+begin_src bash
+source ~/.bashrc
+#+end_src
+
+**** Install Ansible with pipx
+
+#+begin_src bash
+pipx install --include-deps ansible
+#+end_src
+
+The =--include-deps= argument is needed to use any ansible derivated command (eg. ansible-playbook, ...)
+
 *** Introduction
 
 **** Workflow
