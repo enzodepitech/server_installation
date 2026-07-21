@@ -20,16 +20,16 @@
     dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
 
-- name: Add Docker repository
+- name: Add Docker Module Repository
   ansible.builtin.deb822_repository:
     name: docker
-    types: deb
+    types: [deb]
     uris: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
-    suites: "{{ ansible_distribution_release }}"
-    components: stable
-    architectures: amd64
     signed_by: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    suites: ["{{ ansible_distribution_release | lower }}"]
+    components: [stable]
     state: present
+    enabled: yes
     
 - name: Install Docker
   ansible.builtin.apt:
