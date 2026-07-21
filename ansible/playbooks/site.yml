@@ -1,6 +1,6 @@
 ---
 - name: Deploy Nginx Proxy Manager
-  hosts: proxy
+  hosts: all
   become: true
 
   pre_tasks:
