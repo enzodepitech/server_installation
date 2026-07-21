@@ -21,14 +21,10 @@
     mode: '0644'
 
 - name: Add Docker repository
-  ansible.builtin.apt_repository:
+  ansible.builtin.deb822_repository:
     repo: "{{ docker_repo }}"
     state: present
     filename: docker
-
-- name: Update Apt Cache
-  ansible.builtin.apt:
-    update_cache: true
 
 - name: Install Docker
   ansible.builtin.apt:
