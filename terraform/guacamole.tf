@@ -16,7 +16,7 @@ resource "proxmox_virtual_environment_container" "guacamole" {
 
     user_account {
       keys = [
-        file(var.ssh_public_key)
+        var.ssh_public_key
       ]
     }
   }
