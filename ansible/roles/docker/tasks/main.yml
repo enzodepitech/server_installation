@@ -22,10 +22,15 @@
 
 - name: Add Docker repository
   ansible.builtin.deb822_repository:
-    repo: "{{ docker_repo }}"
+    name: docker
+    types: deb
+    uris: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    architectures: amd64
+    signed_by: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
     state: present
-    filename: docker
-
+    
 - name: Install Docker
   ansible.builtin.apt:
     name:
