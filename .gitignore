@@ -48,6 +48,7 @@
 !/ansible
 /ansible/.ansible
 /ansible/*.retry
+/ansible/collections
 
 # ---------------------
 #      Network
