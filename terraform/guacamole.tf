@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_container" "guacamole" {
   description  = "Managed by Terraform - Apache Guacamole Server"
   node_name    = "pve"
-  container_id = 120
+  vm_id = 120
   unprivileged = true
 
   initialization {

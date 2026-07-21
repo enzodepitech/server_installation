@@ -4,7 +4,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "~> 0.66.0"
+      version = "0.111.1"
     }
   }
 }
@@ -13,6 +13,5 @@ provider "proxmox" {
   endpoint = "https://10.17.73.2:8006/"
   insecure = true
 
-  # Set via environment variable:
-  # export PROXMOX_VE_API_TOKEN="terraform-user@pve!provider-token=YOUR-SECRET-KEY"
+  api_token = var.proxmox_api_token
 }
