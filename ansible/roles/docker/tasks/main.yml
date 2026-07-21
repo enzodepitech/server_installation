@@ -23,12 +23,13 @@
   ansible.builtin.deb822_repository:
     name: docker
     types: [deb]
-    uris: https://download.docker.com/linux/debian
-    suites: "{{ ansible_distribution_release }}"
+    uris: "https://download.docker.com/linux/{ ansible_distribution || lower}"
+    suites: "{{ ansible_distribution_release | lower}}"
     components: [stable]
     architectures:
       - amd64
     signed_by: /etc/apt/keyrings/docker.asc
+    enabled: yes
 
 - name: Install Docker Engine
   ansible.builtin.apt:

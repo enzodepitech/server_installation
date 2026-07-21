@@ -1,4 +1,8 @@
 ---
+- name: Vérifier la variable
+  ansible.builtin.debug:
+    var: npm_app_dir
+
 - name: Create application directory
   ansible.builtin.file:
     path: "{{ npm_app_dir }}"
