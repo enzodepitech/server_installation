@@ -170,14 +170,14 @@ pveum role add TerraformProvider -privs "VM.Allocate VM.Audit VM.Clone VM.Config
 *** Create User
 
 #+begin_src bash
-  pveum user add terraform-prov@pve
-  pveum aclmod / -user terraform-prov@pve -role TerraformProvider
+  pveum user add terraform-user@pve
+  pveum aclmod / -user terraform-user@pve -role TerraformProvider
 #+end_src
 
 *** Create an API Token
 
 #+begin_src bash
-pveum user token add terraform-prov@pve terraform -expire 0 -privsep 0 -comment "Terraform token"
+pveum user token add terraform-user@pve terraform-token -expire 0 -privsep 0 -comment "Terraform token"
 #+end_src
 
 Write the secret, it will never be displayed again!
@@ -190,7 +190,11 @@ ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
   
 ** Ansible
 
-Ansible will be used to setup vms.
+Ansible will be used to setup VMs and LXC Containers.
+
+*** Apache Guacamole
+
+
 
 * Guacamole (SSH Access)
 ** Proxmox Community Script
