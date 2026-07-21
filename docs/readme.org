@@ -192,7 +192,36 @@ ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
 
 Ansible will be used to setup VMs and LXC Containers.
 
+*** Introduction
+
+**** Workflow
+
+#+begin_example
+playbook
+└── play (cible : un groupe d'hôtes)
+    ├── tasks
+    │   ├── task 1 (module + paramètres)
+    │   ├── task 2 (module + paramètres)
+    │   └── ...
+    └── handlers (optionnel — déclenchés par notify:)
+#+end_example
+
+*** Proxmox (local)
+
+We use ansible to manage and configure the local proxmox server.
+
+**** Host
+
+#+begin_src 
+all:
+  hosts:
+    localhost:
+      ansible_host: 127.0.0.1
+      ansible_connection: local
+#+end_src
+
 *** Apache Guacamole
+
 
 
 
