@@ -16,7 +16,7 @@ services:
       POSTGRES_PASSWORD: '{{ guac_db_password }}'
     volumes:
       - /var/lib/guacamole/init:/docker-entrypoint-initdb.d
-      - guac_db_data:/var/lib/postgresql/data
+      - guac_db_data:/var/lib/postgresql
     networks:
       - guac_net
 

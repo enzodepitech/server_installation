@@ -5,30 +5,12 @@
     state: directory
     mode: '0755'
 
-- name: Deploy docker-compose.yml configuration
-  ansible.builtin.template:
-    src: docker-compose.yml.j2
-    dest: /var/lib/guacamole/docker-compose.yml
-    mode: '0644'
+- name: Check if schema file already exists locally
+  ansible.builtin.stat:
+    path: /var/lib/guacamole/init/01-initdb.sql
+  register: guac_schema_file
 
-- name: Generate Guacamole PostgreSQL schema file natively
-  community.docker.docker_container_exec:
-    container: guacamole_init_tmp
-    command: /opt/guacamole/bin/initdb.sh --postgres
-  register: guac_schema
-  failed_when: false
-  changed_when: false
-
-- name: Check if Guacamole schema is already loaded
-  community.postgresql.postgresql_query:
-    db: "{{ guac_db_name }}"
-    login_user: "{{ guac_db_user }}"
-    login_password: "{{ guac_db_password }}"
-    query: "SELECT table_name FROM information_schema.tables WHERE table_name='guacamole_user';"
-  register: guac_db_check
-  failed_when: false
-
-- name: Create schema file via temporary docker container
+- name: Generate DB schema via temporary docker container
   community.docker.docker_container:
     name: guacamole_init_temp
     image: guacamole/guacamole:latest
@@ -37,17 +19,25 @@
     detach: false
     cleanup: true
   register: guac_init_output
-  when:
-    - not ansible_check_mode
-    - guac_db_check.rowcount | default(0) == 0
+  when: not guac_schema_file.stat.exists
 
 - name: Save DB schema to persistent storage directory
   ansible.builtin.copy:
     content: "{{ guac_init_output.container.Output }}"
     dest: /var/lib/guacamole/init/01-initdb.sql
     mode: '0644'
+  when: 
+    - not guac_schema_file.stat.exists
+    - guac_init_output is changed
+
+- name: Deploy docker-compose.yml configuration
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /var/lib/guacamole/docker-compose.yml
+    mode: '0644'
 
 - name: Deploy Guacamole stack with Docker Compose
   community.docker.docker_compose_v2:
     project_src: /var/lib/guacamole
     state: present
+    recreate: always
