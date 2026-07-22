@@ -6,7 +6,7 @@
     - proxmox
 
 - name: Deploy Nginx Proxy Manager
-  hosts: all
+  hosts: proxy
   become: true
   roles:
     - docker
