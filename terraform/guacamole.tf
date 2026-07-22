@@ -21,6 +21,10 @@ resource "proxmox_virtual_environment_container" "guacamole" {
     }
   }
 
+  features {
+    nesting = true
+  }
+
   cpu {
     cores = 2
   }
