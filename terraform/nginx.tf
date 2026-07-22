@@ -21,6 +21,11 @@ resource "proxmox_virtual_environment_container" "nginxpm" {
     }
   }
 
+  features {
+    nesting = true
+    keyctl  = true
+  }
+
   cpu {
     cores = 2
   }
