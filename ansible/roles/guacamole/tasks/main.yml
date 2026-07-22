@@ -28,7 +28,7 @@
     detach: false
     cleanup: true
   register: guac_init_output
-  when: not (ansible.check_mode)
+  when: not ansible_check_mode
 
 - name: Save DB schema to persistent storage directory
   ansible.builtin.copy:
