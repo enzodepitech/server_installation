@@ -32,6 +32,7 @@ services:
       POSTGRES_DATABASE: '{{ guac_db_name }}'
       POSTGRES_USER: '{{ guac_db_user }}'
       POSTGRES_PASSWORD: '{{ guac_db_password }}'
+      REMOTE_IP_VALVE_ENABLED=true
     depends_on:
       - guacd
       - guac_db
