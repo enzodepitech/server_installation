@@ -39,7 +39,7 @@
   register: guac_init_output
   when:
     - not ansible_check_mode
-    - guac_db_check.query_result | length == 0
+    - guac_db_check.rowcount | default(0) == 0
 
 - name: Save DB schema to persistent storage directory
   ansible.builtin.copy:
