@@ -11,3 +11,11 @@
   roles:
     - docker
     - nginxPM
+
+- name: Deploy Guacamole Server
+  hosts: guacamole
+  become: true
+  roles:
+    - docker
+    - guacamole
+
