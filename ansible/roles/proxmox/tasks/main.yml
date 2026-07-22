@@ -1,0 +1,6 @@
+---
+- name: Install base packages
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Network Configuration (NAT, Port Fowarding)
+  ansible.builtin.import_tasks: network.yml

@@ -1,13 +1,13 @@
 ---
+- name: Proxmox Configuration
+  hosts: proxmox
+  become: true
+  roles:
+    - proxmox
+
 - name: Deploy Nginx Proxy Manager
   hosts: all
   become: true
-
-  pre_tasks:
-    - name: Debug variable npm_app_dir
-      ansible.builtin.debug:
-        msg: "La variable vaut : {{ npm_app_dir | default('NON DEFINIE') }}"
-
   roles:
     - docker
     - nginxPM

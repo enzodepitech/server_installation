@@ -1,0 +1,17 @@
+---
+- name: Install networks tools
+  ansible.builtin.apt:
+    name:
+      - iptables-persistent
+      - wpa_supplicant # Handle WiFi connection
+      - wireless-tools # Handle WiFi connection
+      - curl
+    state: present
+    update_cache: true
+  
+- name: Install system tools
+  ansible.builtin.apt:
+    name:
+      - htop
+    state: present
+    update_cache: true
