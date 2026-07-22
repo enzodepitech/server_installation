@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name:
       - iptables-persistent
-      - wpa_supplicant # Handle WiFi connection
+      - wpasupplicant # Handle WiFi connection
       - wireless-tools # Handle WiFi connection
       - curl
     state: present
