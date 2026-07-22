@@ -18,14 +18,16 @@
   ansible.builtin.iptables:
     table: nat
     chain: PREROUTING
+    in_interface: "{{ wifi_interface }}"
+    destination: "{{ proxmox_ip }}"
     protocol: tcp
-    destination_port: "{{ item.port_ext }}"
+    destination_port: "{{ item.port_ext | int }}"
     jump: DNAT
     to_destination: "{{ npm_lxc_ip }}:{{ item.port_int }}"
   loop:
-    - { port_ext: "80",   port_int: "80" }
-    - { port_ext: "443",  port_int: "443" }
-    - { port_ext: "8181", port_int: "81" }
+    - { port_ext: 80,   port_int: 80 }
+    - { port_ext: 443,  port_int: 443 }
+    - { port_ext: 8181, port_int: 81 }
 
 - name: Save iptables rules
   ansible.builtin.shell:

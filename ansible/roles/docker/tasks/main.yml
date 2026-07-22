@@ -6,12 +6,6 @@
       - curl
     state: present
     update_cache: true
-  register: apt_result
-  retries: 3
-  delay: 10
-  until: apt_result is succeeded
-  environment:
-    DEBIAN_FRONTEND: noninteractive
 
 - name: Create APT keyrings directory
   ansible.builtin.file:
