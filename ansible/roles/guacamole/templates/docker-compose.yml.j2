@@ -28,7 +28,7 @@ services:
       - "8080:8080"
     environment:
       GUACD_HOSTNAME: guacd
-      POSTGRES_HOSTNAME: '{{ guac_db_name }}'
+      POSTGRES_HOSTNAME: guac_db
       POSTGRES_DATABASE: '{{ guac_db_name }}'
       POSTGRES_USER: '{{ guac_db_user }}'
       POSTGRES_PASSWORD: '{{ guac_db_password }}'
