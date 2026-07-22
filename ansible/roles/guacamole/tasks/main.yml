@@ -19,6 +19,11 @@
   failed_when: false
   changed_when: false
 
+- name: Check if Guacamole SQL schema file exists
+  ansible.builtin.stat:
+    path: /tmp/guacamole_schema.sql
+  register: guac_schema_file
+
 - name: Fallback - Create schema file via temporary docker container
   community.docker.docker_container:
     name: guacamole_init_temp
@@ -28,7 +33,9 @@
     detach: false
     cleanup: true
   register: guac_init_output
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not guac_schema_file.stat.exists
 
 - name: Save DB schema to persistent storage directory
   ansible.builtin.copy:
