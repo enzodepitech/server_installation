@@ -23,7 +23,7 @@
   community.docker.docker_container:
     name: guacamole_init_temp
     image: guacamole/guacamole:latest
-    command: /opt/guacamole/bin/initdb.sh --postgres
+    command: /opt/guacamole/bin/initdb.sh --postgresql
     state: started
     detach: false
     cleanup: true
