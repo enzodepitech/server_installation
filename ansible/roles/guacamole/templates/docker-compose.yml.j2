@@ -7,12 +7,13 @@ services:
       - guac_net
 
   guac_db:
-    image: postgres:15-alpine
+    image: postgres:18-trixie
     container_name: guac_db
     restart: always
     environment:
-      POSTGRESQL_DB: '{{ guac_db_name }}'
-      POSTGRESQL_USER: '{{ guac_db_user }}'
+      POSTGRES_DB: '{{ guac_db_name }}'
+      POSTGRESQL_DATABASE: '{{ guac_db_name }}'
+      POSTGRESQL_USERSAME: '{{ guac_db_user }}'
       POSTGRESQL_PASSWORD: '{{ guac_db_password }}'
     volumes:
       - /var/lib/guacamole/init:/docker-entrypoint-initdb.d
@@ -28,9 +29,10 @@ services:
       - "8080:8080"
     environment:
       GUACD_HOSTNAME: guacd
+      POSTGRESQL_ENABLED: "true"
       POSTGRESQL_HOSTNAME: guac_db
       POSTGRESQL_DATABASE: '{{ guac_db_name }}'
-      POSTGRESQL_USER: '{{ guac_db_user }}'
+      POSTGRESQL_USERNAME: '{{ guac_db_user }}'
       POSTGRESQL_PASSWORD: '{{ guac_db_password }}'
       HTTP_HEADER_REMOTE_IP_CLIENT: "X-Forwarded-For"
     depends_on:
