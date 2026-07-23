@@ -19,3 +19,9 @@
     - docker
     - guacamole
 
+- name: Deploy Homepage (Dashboard)
+  hosts: homepage
+  become: true
+  roles:
+    - docker
+    - homepage

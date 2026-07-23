@@ -258,10 +258,19 @@ ansible-playbook playbooks/site.yml --ask-vault-pass --limit guacamole
 
 You will need to add vault pass to configure guacamole for database user credentials.
 
+*** Microsoft SSO
+
+You can use OpenID to enable log in with microsoft credentials. You must create an 'App Registration' under Epitech organization in microsoft azure portal using =Single-sign on= option and copy the =Client ID= and =Tenant ID= into the vault file.
+
+You must enable =ID tokens= in =Authentification (Preview) > Settings=.
+
+After that, you must create users in guacamole with username corresponding to the school email address.
+
+*** Organization [Work In Progress]
+**** Create Connexion [Work In Progress]
+**** Create Groups
 ** HUB Workshop Web App (Student project) [Work In Progress]
-
 ** Intranet [Work In Progress]
-
 ** GiTea [Work In Progress]
 
 * Todos

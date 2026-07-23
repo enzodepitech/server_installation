@@ -1,0 +1,23 @@
+---
+homepage_dir: "/opt/homepage"
+homepage_port: "3000"
+homepage_title: "Dashboard"
+homepage_allowed_hosts: "dashboard.lilepiserver.duckdns.org"
+
+# Dashboard services
+homepage_services:
+  - Infrastructure:
+      - Proxmox VE:
+          icon: proxmox.png
+          href: "https://pve.lilepiserver.duckdns.org"
+          description: "Virtualization Platform"
+      - Nginx Proxy Manager:
+          icon: nginx-proxy-manager.png
+          href: "https://npm.lilepiserver.duckdns.org"
+          description: "Reverse Proxy & SSL"
+
+  - Access & Remote:
+      - Apache Guacamole:
+          icon: guacamole.png
+          href: "https://guacamole.lilepiserver.duckdns.org/guacamole/"
+          description: "Clientless Remote Desktop"
