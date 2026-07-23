@@ -32,6 +32,13 @@ services:
       POSTGRESQL_DATABASE: '{{ guac_db_name }}'
       POSTGRESQL_USERNAME: '{{ guac_db_user }}'
       POSTGRESQL_PASSWORD: '{{ guac_db_password }}'
+
+      OPENID_AUTHORIZATION_ENDPOINT: "https://login.microsoftonline.com/{{ microsoft_guac_tenant_id }}/oauth2/v2.0/authorize"
+      OPENID_JWKS_ENDPOINT: "https://login.microsoftonline.com/{{ microsoft_guac_tenant_id }}/discovery/v2.0/keys"
+      OPENID_ISSUER: "https://login.microsoftonline.com/{{ microsoft_guac_tenant_id }}/v2.0"
+      OPENID_CLIENT_ID: "{{ microsoft_guac_client_id }}"
+      OPENID_REDIRECT_URI: "https://guacamole.yourdomain.duckdns.org/guacamole/"
+      OPENID_USERNAME_CLAIM_TYPE: "preferred_username"
     depends_on:
       - guacd
       - guac_db

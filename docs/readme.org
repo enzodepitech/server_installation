@@ -1,20 +1,99 @@
 * Introduction
 
-Doc sur le serveur.
+Documentation d'installation et de configuration du serveur.
 
 * Installation
-** Proxmox
 
-Installation de Proxmox VE: https://blog.stephane-robert.info/docs/virtualiser/type1/proxmox/fondamentaux/installation/
+This section covers the different steps to automatically deploy the proxmox server. We used terraform and ansible to automate the deploiement
 
-** Serveur Web du HUB
+** Prerequisites
+*** Proxmox VE
 
-Dossier HUB du serveur
-Dockerfile disponible
-Docker compose disponible
+You need to install Proxmox VE on your server with a bootable key for example. You can follow this link: https://blog.stephane-robert.info/docs/virtualiser/type1/proxmox/fondamentaux/installation/.
 
-* Wifi
-** Information
+*** Ansible
+
+You need to install ansible on your server. One way to do is to use the pipx command.
+
+**** Install pipx
+
+#+begin_src bash
+apt update && apt install -y pipx
+#+end_src
+
+**** Configure the path
+
+#+begin_src bash
+pipx ensurepath
+#+end_src
+
+**** Reload bash environment
+
+#+begin_src bash
+source ~/.bashrc
+#+end_src
+
+**** Install Ansible with pipx
+
+#+begin_src bash
+pipx install --include-deps ansible
+#+end_src
+
+The =--include-deps= argument is needed to use any ansible derivated command (eg. ansible-playbook, ...)
+
+*** Terraform (or OpenTofu)
+
+You need to install terraform on your server and configure it.
+
+**** Installation
+
+Follow this link to install terraform on your server: [[https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli][Terraform Install CLI]]
+
+**** Configuration
+
+We need to configure a terraform user with limited roles (security) to deploy our containers.
+
+***** Create proxmox terraform role
+
+#+begin_src bash
+pveum role add TerraformProvider -privs "VM.Allocate VM.Audit VM.Clone VM.Config.Disk VM.Config.CPU VM.Config.Memory VM.Config.Network VM.Config.Options VM.Config.Cloudinit VM.Config.CDROM VM.Config.HWType VM.PowerMgmt VM.Console VM.Migrate VM.GuestAgent.Audit Datastore.Allocate Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Modify SDN.Use"
+#+end_src
+
+***** Create terraform user
+
+#+begin_src bash
+  pveum user add terraform-user@pve
+  pveum aclmod / -user terraform-user@pve -role TerraformProvider
+#+end_src
+
+***** Create an API token for your terraform user
+
+#+begin_src bash
+pveum user token add terraform-user@pve terraform-token -expire 0 -privsep 0 -comment "Terraform token"
+#+end_src
+
+Write the secret, it will never be displayed again!
+
+***** Create a provider ssh key
+
+This token will allow terraform and ansible to connect to the containers or vms via ssh to create and configure them.
+
+#+begin_src bash
+ssh-keygen -t ed25519 -C "proxmox-provider" -f ~/.ssh/id_ed25519_terraform -N ""
+#+end_src
+
+** Proxmox Configuration
+
+There is an ansible role to configurate proxmox for next steps. It will install packages and configure wifi network.
+
+From the ansible folder, run this script to install system tools:
+
+#+begin_src bash
+ansible-playbooks playbooks/site.yml --limit proxmox
+#+end_src
+
+** WiFi Configuration
+*** Information
 
 |---------+-------------------|
 | Name    | REDACTED   |
@@ -23,8 +102,8 @@ Docker compose disponible
 
 Ressource: https://github.com/ThomasRives/Proxmox-over-wifi/blob/main/README.md
 
-** Pre-requisites
-*** Detect USB dongle
+*** Prerequisites
+**** Detect USB dongle
 
 To verify if the dongle is recognized by the server.
 
@@ -34,13 +113,7 @@ lsusb
 
 Search for device with wifi driver name (eg. 88xbu)
 
-*** Install WiFi tools
-
-#+begin_src bash
-sudo apt install -y wpa_supplicant wireless-tools
-#+end_src
-
-** WiFi Interface
+*** Interface
 
 In =/etc/network/interfaces=, copy & paste this text. The wpa_supplicant.conf file describes the interface connection. You can crypt your password (in next modules).
 
@@ -51,11 +124,11 @@ iface REDACTED inet dhcp
         wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 #+end_src
 
-** Setup wpa conf
+*** Credentials
 
 You can add a network in =/etc/wpa_supplicant/wpa_supplicant.conf= file.
 
-*** IONIS configuration
+**** IONIS configuration
 
 #+begin_src
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -76,7 +149,7 @@ network={
 }
 #+end_src
 
-** Crypt password
+*** Crypt WiFi Password
 
 This command will crypt your password to enhance security.
 
@@ -84,11 +157,11 @@ This command will crypt your password to enhance security.
   echo -n "<your_password>" | iconv -t utf16le | openssl dgst -provider legacy -provider default -md4
 #+end_src
 
-** Setup VM bridge
+*** Pass Internet to your VMs and Containers.
 
 With WiFi, simple bridge doesn't work (device block multiple mac adresses resolution). You will need to use NAT/Masquering method.
 
-*** Virtual Bridge
+**** Virtual Bridge
 
 Example: <vm_gateway_address> = 192.168.10.1; <vm_network> = 192.168.10.0; <vm_network_mask> = 24
 
@@ -105,14 +178,14 @@ iface vmbr0 inet static
         post-down iptables -t nat -D POSTROUTING -s '<vm_network>/24' -o REDACTED -j MASQUERADE
 #+end_src
 
-*** Dnsmasq
-**** Installation
+**** Dnsmasq
+***** Installation
 
 #+begin_src bash
 sudo apt install dnsmasq
 #+end_src
 
-**** Configuration
+***** Configuration
 
 Ensure these lines are active:
 
@@ -137,145 +210,63 @@ dhcp-option=6,[Proxmox_host_IP]
 conf-dir=/etc/dnsmasq.d,*.conf
 #+end_src
 
-***** Static IP
+****** Static IP
 
 Static IPs for VMs are setted with Terraform, not in the dnsmasq configuration file.
 
-**** Restart
+***** Restart
 
 #+begin_src bash
   sudo systemctl restart dsnmasq
 #+end_src
 
-* IaC
-** Terraform
+** Nginx Proxy Manager
 
-Terraform will be used to define and maintain VMs and LXC Containers. We use one terraform file per service.
+We use a local Nginx Proxy Manager to map urls to ip:port. For example, a student taps "my_server.domainepitech" url in his browser and it redirects to "192.168.1.1:4000" internally without showing him.
 
-Global configuration files:
-  - provider.tf (proxmox)
-  - variables.tf
-  - terraform.tfvars (secrets)
+*** Deploy
 
-Services configuration files:
-  - guacamole.tf
-  - student-vms.tf
-
-*** Create proxmox terraform role
+The Nginx PM container is defined in =terraform/nginxPM.tf= file.
 
 #+begin_src bash
-pveum role add TerraformProvider -privs "VM.Allocate VM.Audit VM.Clone VM.Config.Disk VM.Config.CPU VM.Config.Memory VM.Config.Network VM.Config.Options VM.Config.Cloudinit VM.Config.CDROM VM.Config.HWType VM.PowerMgmt VM.Console VM.Migrate VM.GuestAgent.Audit Datastore.Allocate Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Modify SDN.Use"
+terraform apply -target="proxmox_virtual_environment_container.nginxpm"
 #+end_src
 
-*** Create User
+*** Configurate
+
+To configurate run this ansible command.
 
 #+begin_src bash
-  pveum user add terraform-user@pve
-  pveum aclmod / -user terraform-user@pve -role TerraformProvider
+ansible-playbook playbooks/site.yml --limit nginxpm
 #+end_src
 
-*** Create an API Token
+** Guacamole
+
+Guacamole server is used to facilitate student connection to a vm. It also supports rdp protocol. It uses the microsoft students credentials (microsoft entra id)
+
+*** Deploy
 
 #+begin_src bash
-pveum user token add terraform-user@pve terraform-token -expire 0 -privsep 0 -comment "Terraform token"
+terraform apply -target="proxmox_virtual_environment_container.guacamole"
 #+end_src
 
-Write the secret, it will never be displayed again!
-
-*** Create a Ssh key
+*** Configurate
 
 #+begin_src bash
-ssh-keygen -t ed25519 -C "terraform-user" -f ~/.ssh/id_ed25519_terraform -N ""
-#+end_src
-  
-** Ansible
-
-Ansible will be used to setup VMs and LXC Containers.
-
-*** Installation
-
-**** Install pipx
-
-#+begin_src bash
-apt update && apt install -y pipx
+ansible-playbook playbooks/site.yml --ask-vault-pass --limit guacamole  
 #+end_src
 
-**** Configure PATH
+You will need to add vault pass to configure guacamole for database user credentials.
 
-#+begin_src bash
-pipx ensurepath
-#+end_src
+** HUB Workshop Web App (Student project) [Work In Progress]
 
-**** Reload bashrc
+** Intranet [Work In Progress]
 
-#+begin_src bash
-source ~/.bashrc
-#+end_src
+** GiTea [Work In Progress]
 
-**** Install Ansible with pipx
-
-#+begin_src bash
-pipx install --include-deps ansible
-#+end_src
-
-The =--include-deps= argument is needed to use any ansible derivated command (eg. ansible-playbook, ...)
-
-*** Introduction
-
-**** Workflow
-
-#+begin_example
-playbook
-└── play (cible : un groupe d'hôtes)
-    ├── tasks
-    │   ├── task 1 (module + paramètres)
-    │   ├── task 2 (module + paramètres)
-    │   └── ...
-    └── handlers (optionnel — déclenchés par notify:)
-#+end_example
-
-*** Proxmox (local)
-
-We use ansible to manage and configure the local proxmox server.
-
-**** Host
-
-#+begin_src 
-all:
-  hosts:
-    localhost:
-      ansible_host: 127.0.0.1
-      ansible_connection: local
-#+end_src
-
-*** Apache Guacamole
-
-
-
-
-* Guacamole (SSH Access)
-** Proxmox Community Script
-
-It will create a LXC Container running a guacamole apache server.
-
-#+begin_src bash
-bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/apache-guacamole.sh)
-#+end_src
-
-** Terraform configuration
-
-
-
-** Ansible configuration
-
-* Nginx Proxy Manager
-
-We use a local Nginx Proxy Manager to map urls to ip:port. Example: a student taps "my_server.domainepitech" in his browser and it redirects to "192.168.1.1:4000" internally without showing him.
-
-* Intranet
-** Wiki
-* GiTea 
-* Hébergement
+* Todos
+* Version
+* Public Deployement solution
 ** Solution 1
 
 VPS (install WireGuard server (reverse tunneling) & Nginx (reverse proxy))
@@ -297,5 +288,5 @@ On demande à Epitech d'avoir des sous-domaines de epitech.eu (sous-domaine wild
 ** Solution 3 (local)
 
 Disponible que sur IONIS, les étudiants doivent être sur le réseau de l'école pour avoir accès.
-Nom de domaine (soit epitech officiel soit autre temporairement)+ Ajouter Nginx en local sur le serveur pour les redirections.
+Nom de domaine (soit epitech officiel soit autre temporairement) + Ajouter Nginx en local sur le serveur pour les redirections.
 
