@@ -95,10 +95,9 @@ ansible-playbooks playbooks/site.yml --limit proxmox
 ** WiFi Configuration
 *** Information
 
-|---------+-------------------|
-| Name    | REDACTED   |
-| REDACTED    | REDACTED |
-|---------+-------------------|
+|----------+----------|
+| Name     | wlx...   |
+|----------+----------|
 
 Ressource: https://github.com/ThomasRives/Proxmox-over-wifi/blob/main/README.md
 
@@ -118,8 +117,8 @@ Search for device with wifi driver name (eg. 88xbu)
 In =/etc/network/interfaces=, copy & paste this text. The wpa_supplicant.conf file describes the interface connection. You can crypt your password (in next modules).
 
 #+begin_src 
-allow-hotplug REDACTED
-iface REDACTED inet dhcp
+allow-hotplug <wlx...>
+iface <wlx...> inet dhcp
         dns-nameservers 1.1.1.1 8.8.8.8
         wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 #+end_src
@@ -174,8 +173,8 @@ iface vmbr0 inet static
         bridge-fd 0
 
         post-up echo 1 > /proc/sys/net/ipv4/ip_forward
-        post-up iptables -t nat -A POSTROUTING -s '<vm_network>/24' -o REDACTED -j MASQUERADE
-        post-down iptables -t nat -D POSTROUTING -s '<vm_network>/24' -o REDACTED -j MASQUERADE
+        post-up iptables -t nat -A POSTROUTING -s '<vm_network>/24' -o <wlx...> -j MASQUERADE
+        post-down iptables -t nat -D POSTROUTING -s '<vm_network>/24' -o <wlx...> -j MASQUERADE
 #+end_src
 
 **** Dnsmasq
