@@ -25,3 +25,10 @@
   roles:
     - docker
     - homepage
+
+- name: Deploy VM Party (VM Manager)
+  hosts: vmparty
+  become: true
+  roles:
+    - docker
+    - vmparty

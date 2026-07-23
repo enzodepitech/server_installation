@@ -1,0 +1,76 @@
+---
+# -----------------------------------------------------------------------------
+# System dependencies
+# -----------------------------------------------------------------------------
+- name: Install systems dependencies
+  ansible.builtin.apt:
+    name:
+      - pipx
+      - git
+      - openssh-client
+    state: present
+    update_cache: yes
+
+# -----------------------------------------------------------------------------
+# VM Ansible configuration
+# -----------------------------------------------------------------------------
+- name: Install Ansible CLI via pipx
+  community.general.pipx:
+    name: ansible
+    state: present
+
+- name: Install ansible proxmox collection from galaxy
+  ansible.builtin.ansible_galaxy:
+    type: collection
+    name: community.general
+    state: present
+    executable: /root/.local/bin/ansible-galaxy
+
+- name: Create ansible global directory
+  ansible.builtin.file:
+    path: /etc/ansible
+    state: directory
+    mode: '0755'
+
+- name: Deploy global ansible configuration file
+  ansible.builtin.copy:
+    src: ansible/ansible.cfg
+    dest: /etc/ansible/ansible.cfg
+    mode: '0644'
+
+- name: Deploy ansible VM deploiement file
+  ansible.builtin.copy:
+    src: ansible/deploy_vms.yml
+    dest: /etc/ansible/deploy_vms.yml
+    mode: '0644'
+
+# -----------------------------------------------------------------------------
+# VmParty Configuration
+# -----------------------------------------------------------------------------
+- name: Create VM Manager directory
+  ansible.builtin.file:
+    path: "{{ vm_manager_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Clone VM Manager git repository
+  ansible.builtin.git:
+    repo: "{{ vm_manager_github_repo_url }}"
+    dest: "{{ vm_manager_dir }}"
+    version: main
+    force: yes
+
+- name: Créer l'arborescence de stockage pour SQLite et les exports Ansible
+  ansible.builtin.file:
+    path: "{{ vm_manager_dir }}/storage/exports"
+    state: directory
+    mode: '0755'
+
+# -----------------------------------------------------------------------------
+# Launch App
+# -----------------------------------------------------------------------------
+- name: Deploy VM Manager Docker Container
+  community.docker.docker_compose_v2:
+    project_src: "{{ vm_manager_dir }}"
+    state: present
+    build: always
