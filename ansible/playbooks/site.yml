@@ -20,7 +20,7 @@
     - guacamole
 
 - name: Deploy Homepage (Dashboard)
-  hosts: homepage
+  hosts: dashboard
   become: true
   roles:
     - docker
