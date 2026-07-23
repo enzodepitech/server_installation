@@ -1,5 +1,4 @@
 ---
 npm_lxc_ip: "192.168.10.101"
 lxc_subnet: "192.168.10.0/24"
-wifi_interface: "REDACTED"
 proxmox_ip: "10.17.73.2"
