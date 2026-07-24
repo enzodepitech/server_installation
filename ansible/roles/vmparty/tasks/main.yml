@@ -22,7 +22,7 @@
 - name: Install Proxmox Galaxy collection
   community.general.ansible_galaxy_install:
     type: collection
-    name: bpg.proxmox
+    name: community.proxmox
     state: present
   delegate_to: localhost
 
