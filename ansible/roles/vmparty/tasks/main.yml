@@ -21,7 +21,7 @@
 
 - name: Install Proxmox Collection
   ansible.builtin.command:
-    cmd: ansible-galaxy collection install bpg.proxmox
+    cmd: /root/.local/bin/ansible-galaxy collection install bpg.proxmox
   register: galaxy_cmd
   changed_when: "'is already installed' not in galaxy_cmd.stdout"
 
