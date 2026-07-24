@@ -19,12 +19,13 @@
     name: ansible
     state: present
 
-- name: Install a Galaxy collection using community.general module
+- name: Install Proxmox community module
   community.general.ansible_galaxy_install:
     type: collection
     name: community.proxmox
     state: present
-    executable: /root/.local/bin/ansible-galaxy
+  environment:
+    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
 
 - name: Create ansible global directory
   ansible.builtin.file:
