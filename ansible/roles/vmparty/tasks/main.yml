@@ -19,11 +19,12 @@
     name: ansible
     state: present
 
-- name: Install Proxmox Galaxy collection
+- name: Install a Galaxy collection using community.general module
   community.general.ansible_galaxy_install:
     type: collection
-    name: community.proxmox
+    name: bpg.proxmox
     state: present
+    executable: /root/.local/bin/ansible-galaxy
 
 - name: Create ansible global directory
   ansible.builtin.file:
