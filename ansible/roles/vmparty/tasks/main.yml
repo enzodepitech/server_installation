@@ -31,18 +31,6 @@
     state: directory
     mode: '0755'
 
-- name: Deploy global ansible configuration file
-  ansible.builtin.copy:
-    src: ansible/ansible.cfg
-    dest: /etc/ansible/ansible.cfg
-    mode: '0644'
-
-- name: Deploy ansible VM deploiement file
-  ansible.builtin.copy:
-    src: ansible/deploy_vms.yml
-    dest: /etc/ansible/deploy_vms.yml
-    mode: '0644'
-
 # -----------------------------------------------------------------------------
 # VmParty Configuration
 # -----------------------------------------------------------------------------
