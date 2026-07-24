@@ -19,5 +19,5 @@ homepage_services:
   - Access & Remote:
       - Apache Guacamole:
           icon: guacamole.png
-          href: "https://guacamole.lilepiserver.duckdns.org/guacamole/"
+          href: "https://guacamole.lilepiserver.duckdns.org/"
           description: "Clientless Remote Desktop"
