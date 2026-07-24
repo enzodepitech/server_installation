@@ -19,13 +19,11 @@
     name: ansible
     state: present
 
-- name: Install Proxmox community module
-  community.general.ansible_galaxy_install:
-    type: collection
-    name: community.proxmox
-    state: present
-  environment:
-    PATH: "/root/.local/bin/ansible-galaxy"
+- name: Install Proxmox Collection
+  ansible.builtin.command:
+    cmd: ansible-galaxy collection install bpg.proxmox
+  register: galaxy_cmd
+  changed_when: "'is already installed' not in galaxy_cmd.stdout"
 
 - name: Create ansible global directory
   ansible.builtin.file:
