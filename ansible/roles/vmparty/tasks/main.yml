@@ -25,7 +25,7 @@
     name: community.proxmox
     state: present
   environment:
-    PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
+    PATH: "/root/.local/bin/ansible-galaxy"
 
 - name: Create ansible global directory
   ansible.builtin.file:
