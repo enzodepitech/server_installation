@@ -24,7 +24,6 @@
     type: collection
     name: community.proxmox
     state: present
-  delegate_to: localhost
 
 - name: Create ansible global directory
   ansible.builtin.file:
