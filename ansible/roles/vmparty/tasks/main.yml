@@ -24,7 +24,7 @@
     type: collection
     name: bpg.proxmox
     state: present
-    executable: /root/.local/bin/ansible-galaxy
+    executable_path: /root/.local/bin/ansible-galaxy
 
 - name: Create ansible global directory
   ansible.builtin.file:
